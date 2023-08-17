@@ -1,0 +1,146 @@
+module ccsa-an-slice-pub-type {
+  namespace "urn:ccsa:yang:ccsa-an-slice-pub-type";
+  prefix "an-slice-type";
+  
+  organization 
+    "CCSA";
+  
+  contact
+    "CCSA";
+
+  revision 2023-08-17 {
+    description
+      "Initial revision.";
+  }
+  
+  typedef admin-status {
+    type enumeration {
+      enum admin-up {
+        value 0 ;
+        description "admin up,the operate-status is depend on the real running status.";
+      }
+      enum admin-down {
+        value 1 ;
+        description "admin down,the operate-status is forced to down no matter what the real status is" ;
+      }      
+    }
+  }
+  
+  typedef operate-status {
+    type enumeration {
+      enum operate-up {
+        value 0 ;
+        description "operate up." ;
+      }
+      enum operate-down {
+        value 1 ;
+        description "operate down." ;
+      }
+    }
+  }  
+  
+  typedef down-clear-reason-type {
+    type enumeration {
+      enum up {
+        value 0 ;
+        description "operate status is up." ;
+      }
+      enum delete {
+        value 1 ;
+        description "the object instance is deleted and not exist." ;
+      }
+    }
+  }
+  typedef hex-binary {
+    type string {
+      length "1..10";
+      pattern "(0x|0X)?[0-9a-fA-F]+";
+      }
+    description "This is a hexadecimal variable.";
+  }
+  typedef display-string {
+      type string {
+        pattern "[A-Za-z0-9_\-]*";
+      }
+      description "This is the display-string type.";
+  }
+   
+  typedef username {
+    type string {
+      pattern "[A-Za-z0-9_\-$@]*";
+    }
+    description "This is the username type.";
+  }
+  
+  typedef password {
+    type string {
+      pattern "[!-~]*";
+    }
+    description "This is the password type.";
+  }
+  
+  typedef wan-auth-type {
+    type enumeration {
+      enum IPoE {
+        value 0 ;
+        description "WAN is authenticated by IPoE." ;
+      }
+      enum PPPoE {
+        value 1 ;
+        description "WAN is authenticated by PPPoE." ;
+      }
+    }
+  }
+  
+  grouping ltp-slice-single{
+         leaf ns-res-id {
+            mandatory true;
+            type string;
+            description
+                "network Slice identifier";
+        }
+        leaf ltp-slice-res-id {
+            mandatory true;
+            type string;
+            description
+                "LTP Slice identifier.";
+        }
+    
+        leaf ne-res-id {
+            type yang:uuid;
+            description
+                "OLT(Network Element) identifier.";
+        }
+        leaf ltp-res-id {
+            type yang:uuid;
+            description
+                "LTP identifier.";
+        }
+        container ltp-slice-info{
+            leaf assigned-bandwidth{
+                type decimal64{
+                    fraction-digits 3;
+                }
+                units kbps;
+                description
+                    "Allocated bandwidth.";
+            }
+            leaf used-bandwidth{
+                type decimal64{
+                    fraction-digits 3;
+                }
+                units kbps;
+                description
+                    "Used bandwidth.";
+            }
+             leaf convergence-ratio {
+                  type decimal64 {
+                      fraction-digits 1;
+                      range "1.0..50.0";
+                  }
+                  default 10.0;
+                  description "Configure the bandwidth convergence ratio of the interface. ";
+            }
+        }
+    }
+}

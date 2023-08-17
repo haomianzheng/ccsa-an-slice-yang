@@ -1,0 +1,50 @@
+module: ccsa-an-slice-service
+   +--rw slice-service
+      +--rw slats
+      |  +--rw slat* [template-name]
+      |     +--rw template-name    string
+      |     +--rw upstream
+      |     |  +--rw fixed-bandwidth?   uint64
+      |     +--rw downstream
+      |     |  +--rw fixed-bandwidth?   uint64
+      |     +--rw max-latency?     uint32
+      |     +--rw max-jitter?      uint32
+      |     +--rw max-loss?        decimal64
+      +--rw nsts
+      |  +--rw nst* [name]
+      |     +--rw name                 string
+      |     +--rw sla-template-name?   leafref
+      |     +--rw isolation-type?      identityref
+      |     +--rw app-type* [main-type sub-type]
+      |        +--rw main-type    string
+      |        +--rw sub-type     string
+      +--rw nsis
+         +--rw nsi* [nst-name]
+            +--rw nst-name    leafref
+            +--rw olts
+            |  +--rw olt* [olt-res-id]
+            |     +--rw olt-res-id    yang:uuid
+            |     +--rw nni-ports
+            |     |  +--rw nni-port* [ltp-slice-res-id]
+            |     |     +--rw ns-res-id           string
+            |     |     +--rw ltp-slice-res-id    string
+            |     |     +--rw ne-res-id?          yang:uuid
+            |     |     +--rw ltp-res-id?         yang:uuid
+            |     |     +--rw ltp-slice-info
+            |     |        +--rw assigned-bandwidth?   decimal64
+            |     |        +--rw used-bandwidth?       decimal64
+            |     |        +--rw convergence-ratio?    decimal64
+            |     +--rw uni-ports
+            |        +--rw uni-port* [ltp-slice-res-id]
+            |           +--rw ns-res-id           string
+            |           +--rw ltp-slice-res-id    string
+            |           +--rw ne-res-id?          yang:uuid
+            |           +--rw ltp-res-id?         yang:uuid
+            |           +--rw ltp-slice-info
+            |              +--rw assigned-bandwidth?   decimal64
+            |              +--rw used-bandwidth?       decimal64
+            |              +--rw convergence-ratio?    decimal64
+            +--rw onts
+               +--rw ont* [onu-res-id]
+                  +--rw onu-res-id       string
+                  +--rw wan-auth-type?   an-slice-type:wan-auth-type

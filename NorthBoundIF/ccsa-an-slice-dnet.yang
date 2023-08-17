@@ -1,0 +1,60 @@
+module ccsa-an-slice-dnet {
+namespace urn:ccsa:params:xml:ns:yang:ccsa-access-network-pon-resource-slice;
+prefix tns;
+  import ietf-yang-types{
+        prefix yang;
+    }
+
+  import ccsa-an-slice-pub-type {
+    prefix an-slice-type;
+  }
+    organization
+        "CCSA TC6WG2";
+
+    description
+        "This module defines a YANG data model to configure an access
+         network PON resource slice realization.";
+
+    revision 2023-08-17{
+        description
+            "Initial Version.";
+    }
+    
+    container network-slices{
+        description
+            "Generic network slice configurations";
+        list network-slice{
+            key ns-res-id;
+            description
+                "Network slice identifier";
+            leaf ns-res-id{
+                type yang:uuid;
+                description
+                    "A unique network slice identifier across a slice controller";
+            }
+            leaf ns-name{
+                type string;
+                description
+                        "Name of the specific network slice";
+            }
+            leaf ns-description{
+                type string;
+                description
+                    "Description regarding the specific network slice";
+            } 
+            container ltp-slices{
+                list ltp-slice{
+                    key ltp-slice-res-id;
+                    description
+                        "List of ltp slice.";
+                    uses an-slice-type:ltp-slice-single;
+                }
+            }
+        }
+        //network-slice
+
+    }
+    //network slices
+
+
+}
