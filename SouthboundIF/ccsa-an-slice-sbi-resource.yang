@@ -1,0 +1,179 @@
+module ccsa-an-slice-sbi-resource {
+    yang-version 1;
+    namespace "urn:ccsa:yang:ccsa-an-slice-dnet";
+    prefix an-slice-sbi-res;
+
+    import ietf-interfaces {
+        prefix if;
+    }
+
+    organization
+      "CCSA";
+    contact
+      "CCSA";
+    description
+      "Applicable for device configuration, of network resource slices.";
+
+    revision 2023-08-17 {
+        description
+          "Initial revision.";
+    }
+    typedef slice-mode {
+        type enumeration {
+            enum "van" {
+                value 0;
+                description
+                  "The access node creates a virtual system to implement slicing.";
+            }
+            enum "fans" {
+                value 1;
+                description
+                  "The access node creates channelized sub-interfaces to implement slicing.";
+            }
+        }
+        description
+          "This attribute depicts slice mode.";
+    }
+
+    container slice-an {
+        description
+          "Configure the system slice mode.";
+        leaf mode {
+            type slice-mode;
+            default "fans";
+            description
+              "Configure slice mode. The value can be van, fans.";
+        }
+        container dedicated-networks {
+            description
+              "List of dedicated-networks.";
+            list dedicated-network {
+                key "name";
+                description
+                  "Configure a dedicated-network.";
+                leaf name {
+                    type string {
+                        length "1..32";
+                    }
+                    description
+                      "Indicates the name of a dedicated-network. Names with only one or more space characters are not supported. DNet-0 exists by default.";
+                }
+                leaf id {
+                    type uint32 {
+                        range "0..8";
+                    }
+                    config false;
+                    description
+                      "Indicates the dedicated network ID. The value is automatically allocated by the system when the dedicated network is created. The value ranges from 0 to 8.";
+                }
+                leaf description {
+                    type string {
+                        length "1..64";
+                    }
+                    description
+                      "Indicates the description of a dedicated-network. Descriptions with only one or more space characters are not supported.";
+                }
+                container ports {
+                    description
+                      "List of ports in a network dedicated-network.";
+                    list port {
+                        key "ifname";
+                        description
+                          "Configure ethernetCsmacd ports, gpon ports, epon ports or otn vport to a dedicated-network.";
+                        leaf ifname {
+                            type if:interface-ref;
+                            must "/if:interfaces/if:interface[if:name = current()]/if:type='ianaift:ethernetCsmacd' or
+                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
+                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon'" {
+                                error-message
+                                  "must reference an ethernetCsmacd interface, vport interface, epon interface or gpon interface.";
+                            }
+                            description
+                              "Name of an ethernet port, epon port, otn vport or gpon port.";
+                        }
+                        choice slice-port-type {
+                            description
+                              "Indicates the port type of a dedicated-network.";
+                            case port {
+                                description
+                                  "Indicates an ethernet port, epon port, otn vport or gpon port add to dedicated-network.";
+                                container port-bandwidth {
+                                    description
+                                      "Configure the port bandwidth. Four types of bandwidth can be configured: unlimited or assured bandwidth.";
+                                    choice port-bandwidth-type {
+                                        description
+                                          "Indicates the bandwidth configured for a port. The bandwidth can be set to unlimited or assured bandwidth.";
+                                        case unlimited {
+                                            description
+                                              "Indicates that the bandwidth is not limited.";
+                                            leaf unlimited-bandwidth {
+                                                type empty;
+                                                description
+                                                  "Indicates that the bandwidth of the slice port is not limited.";
+                                            }
+                                        }
+                                        case port-bandwidth {
+                                            description
+                                              "Indicates that the port bandwidth can be configured.";
+                                            leaf assured-bandwidth {
+                                                type uint32 {
+                                                    range "1..100000";
+                                                }
+                                                units "Mbit/s";
+                                                description
+                                                  "Indicates the assured bandwidth allocated to a port.";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            case port-channel {
+                                description
+                                  "Indicates a combo pon port channel add to dedicated-network.";
+                                container channel-bandwidth {
+                                    description
+                                      "Configure the port channel bandwidth. Four types of bandwidth can be configured: unlimited or assured bandwidth.";
+                                    choice channel-bandwidth-type {
+                                        description
+                                          "Indicates the bandwidth configured for a combo pon port channel. The bandwidth can be set to unlimited or assured bandwidth.";
+                                        case unlimited {
+                                            description
+                                              "Indicates that the bandwidth is not limited.";
+                                            leaf unlimited-bandwidth {
+                                                type empty;
+                                                description
+                                                  "Indicates that the bandwidth of the combo pon port channel is not limited.";
+                                            }
+                                        }
+                                        case channel-bandwidth {
+                                            description
+                                              "Indicates that the combo pon port channel bandwidth can be configured.";
+                                            leaf channel-0-assured-bandwidth {
+                                                type uint32 {
+                                                    range "0..100000";
+                                                }
+                                                units "Mbit/s";
+                                                mandatory true;
+                                                description
+                                                  "Indicates the assured bandwidth allocated to the channel 0.";
+                                            }
+                                            leaf channel-1-assured-bandwidth {
+                                                type uint32 {
+                                                    range "0..100000";
+                                                }
+                                                units "Mbit/s";
+                                                mandatory true;
+                                                description
+                                                  "Indicates the assured bandwidth allocated to the channel 1.";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

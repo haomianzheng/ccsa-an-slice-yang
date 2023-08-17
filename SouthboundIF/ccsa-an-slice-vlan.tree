@@ -1,0 +1,28 @@
+module: ccsa-an-slice-vlan
+   +--rw vlans
+      +--rw vlan* [id]
+      |  +--rw id                 l2-forwarder
+      |  +--rw name?              string
+      |  +--rw description?       string
+      |  +--rw reserved?          boolean
+      |  +--rw forwarding-type?   enumeration
+      |  +--rw tag-attribute?     enumeration
+      +--rw management-vlan {management-vlan}?
+      |  +--rw vlanid?   uint16
+      +--rw lan-vlan {lan-vlan}?
+         +--rw vlanid?   uint16
+augment /if:interfaces/if:interface:
+   +--rw vlan!
+      +--rw port-link-type?   enumeration
+      +--rw default-vlan?     l2-forwarder
+      +--rw (link-type)?
+         +--:(hybrid)
+         |  +--rw hybrid
+         |     +--rw tagged-vlan*     union
+         |     +--rw untagged-vlan*   union
+         +--:(trunk)
+         |  +--rw trunk
+         |     +--rw trunk-vlan*   l2-forwarder
+         +--:(dot1q)
+            +--rw dot1q
+               +--rw dot1q-vlan?   vlan-id
