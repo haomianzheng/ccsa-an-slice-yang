@@ -1,0 +1,7 @@
+南向接口文件，包含
+
+VLAN ccsa-an-slice-vlan.yang
+资源切片ccsa-an-slice-sbi-resource.yang
+业务切片ccsa-an-slice-sbi-service.yang
+
+以及对应Tree
