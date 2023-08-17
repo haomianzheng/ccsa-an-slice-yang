@@ -1,0 +1,6 @@
+北向接口清单，包含
+通用类型ccsa-an-slice-pub-type
+资源切片ccsa-an-slice-dnet.yang
+业务切片ccsa-an-slice-service.yang
+
+以及对应Tree
