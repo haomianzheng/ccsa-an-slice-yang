@@ -2,15 +2,23 @@ module ccsa-an-slice-pub-type {
   namespace "urn:ccsa:yang:ccsa-an-slice-pub-type";
   prefix "an-slice-type";
   
+  import ietf-yang-types {
+    prefix yang;
+  }
   organization 
     "CCSA";
   
-  contact
-    "CCSA";
+  description
+    "This module provides the public types for AN slices. ";
 
   revision 2023-08-17 {
     description
       "Initial revision.";
+  }
+  
+  revision 2023-10-08{
+    description
+      "Submit for Final Version.";
   }
   
   typedef admin-status {
@@ -51,30 +59,30 @@ module ccsa-an-slice-pub-type {
       }
     }
   }
+  
   typedef hex-binary {
     type string {
-      length "1..10";
-      pattern "(0x|0X)?[0-9a-fA-F]+";
+      pattern '(0x|0X)?[0-9a-fA-F]+';
       }
     description "This is a hexadecimal variable.";
   }
   typedef display-string {
       type string {
-        pattern "[A-Za-z0-9_\-]*";
+        pattern '[A-Za-z0-9_\-]*';
       }
       description "This is the display-string type.";
   }
    
   typedef username {
     type string {
-      pattern "[A-Za-z0-9_\-$@]*";
+      pattern '[A-Za-z0-9_\-$@]*';
     }
     description "This is the username type.";
   }
   
   typedef password {
     type string {
-      pattern "[!-~]*";
+      pattern '[!-~]*"';
     }
     description "This is the password type.";
   }
@@ -95,9 +103,9 @@ module ccsa-an-slice-pub-type {
   grouping ltp-slice-single{
          leaf ns-res-id {
             mandatory true;
-            type string;
+            type yang:uuid;
             description
-                "network Slice identifier";
+                "network Slice identifier, should be consistent with ns-res-id in the D-net. ";
         }
         leaf ltp-slice-res-id {
             mandatory true;
@@ -118,20 +126,21 @@ module ccsa-an-slice-pub-type {
         }
         container ltp-slice-info{
             leaf assigned-bandwidth{
-                type decimal64{
+                type uint64{
                     fraction-digits 3;
                 }
-                units kbps;
+                units bps;
                 description
-                    "Allocated bandwidth.";
+                    "Configure the allocated bandwidth.";
             }
             leaf used-bandwidth{
-                type decimal64{
+                config false;
+                type uint64{
                     fraction-digits 3;
                 }
-                units kbps;
+                units bps;
                 description
-                    "Used bandwidth.";
+                    "Status of used bandwidth.";
             }
              leaf convergence-ratio {
                   type decimal64 {

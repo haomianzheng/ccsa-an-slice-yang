@@ -1,6 +1,6 @@
 module ccsa-an-slice-dnet {
 namespace urn:ccsa:params:xml:ns:yang:ccsa-access-network-pon-resource-slice;
-prefix tns;
+prefix an-slice-dnet;
   import ietf-yang-types{
         prefix yang;
     }
@@ -8,17 +8,17 @@ prefix tns;
   import ccsa-an-slice-pub-type {
     prefix an-slice-type;
   }
-    organization
-        "CCSA TC6WG2";
+  organization
+      "CCSA TC6WG2";
 
-    description
-        "This module defines a YANG data model to configure an access
-         network PON resource slice realization.";
+  description
+      "This module defines a YANG data model to configure an access
+       network PON resource slice realization.";
 
-    revision 2023-08-17{
-        description
-            "Initial Version.";
-    }
+  revision 2023-10-08{
+      description
+          "Submit for Final Version.";
+  }
     
     container network-slices{
         description
