@@ -1,0 +1,184 @@
+module ccsa-an-slice-sbi-vlan {
+  namespace "urn:ccsa:yang:ccsa-an-slice-sbi-vlan";
+  prefix an-slice-vlan;
+ 
+  import bbf-dot1q-types {
+    prefix bbf-dot1qt;
+  }
+
+  organization "CCSA.";
+
+  description
+    "This module contains a collection of YANG definitions for
+     managing vlans.";
+
+  revision 2023-10-08{
+      description
+          "Submit for Final Version.";
+  }
+  /*
+   * Features
+   */
+   
+  feature management-vlan {
+    description "Defines the feature of management-vlan.";
+  }
+    
+  feature lan-vlan {
+    description "Defines the feature of lan-vlan.";
+  }
+
+
+  /*
+   * Typedefs
+   */
+   
+  typedef vlan-forwarder {
+    type string {
+      pattern 'forwarder\\.(\\S+)\\.(\\d{1,4})';
+    }
+    description "Indicates the VLAN forwarding domain.";
+  }
+
+  typedef l2-forwarder {
+    type union {
+      type bbf-dot1qt:vlan-id;
+      type vlan-forwarder;
+    }
+    description "Indicates the Layer 2 VLAN forwarding domain.";
+  }
+  
+  typedef vlan-range {
+    type string {
+      // range specified as [lower]..[upper]
+      pattern '(409[0-4]|40[0-8][0-9]|[1-3][0-9]{3}|'       +
+              '[1-9][0-9]{1,2}|[1-9])..(409[0-4]|'          +
+              '40[0-8][0-9]|[1-3][0-9]{3}|[1-9][0-9]{1,2}|' +
+              '[1-9])';
+    }
+    description
+      "Type definition representing a range of single-tagged
+      VLANs. A range is specified as x..y where x and y are
+      valid VLAN IDs (1 <= vlan-id <= 4094). The range is
+      assumed to be inclusive, such that any VLAN-ID matching
+      x <= VLAN-ID <= y falls within the range.";
+  }
+
+  /*
+   * Configuration data nodes
+   */
+   
+  container vlans {
+    description "The vlan's configurations.";
+
+    list vlan {
+      key "id";
+      description "A list of VLANs.";
+      leaf id {
+        type l2-forwarder;
+        description "Specifies the VLAN ID.";
+      }
+
+      leaf name {
+        type string;
+        description "Specifies the VLAN name.";
+      }
+
+      leaf description {
+        type string;
+        description "Specifies the description of a VLAN.";
+      }
+
+      leaf reserved {
+        type boolean;
+        default "false";
+        description "Specifies the reserved VLAN ID.";
+      }
+      
+      leaf forwarding-type {
+        type enumeration {
+          enum mux {
+            value 0;
+            description "Indicates the MUX VLAN. A MUX VLAN can contain multiple
+            upstream ports, but only one service port. The service ports of 
+            different VLANs are isolated from each other. The system maps the
+            VLAN to the user. Therefore, users can be differentiated by the VLANs.";
+          }
+          enum standard {
+            value 1;
+            description "Indicates the standard VLAN. A standard VLAN contains
+            multiple upstream ports. Ethernet ports in a standard VLAN can 
+            communicate with each other. Ethernet ports of different VLANs
+            are isolated from each other.";
+          }
+          enum smart {
+            value 2;
+            description "Indicates the smart VLAN. A smart VLAN can contain 
+            multiple upstream ports and service ports. The service ports in 
+            a same smart VLAN are isolated from each other. The service ports 
+            of different VLANs are isolated from each other. One VLAN supports 
+            multiple users, which saves the VLAN resources.";
+          }
+        }
+        default smart;
+        description "The forwarding type of the VLAN.";
+      }
+      
+      leaf tag-attribute {
+        type enumeration {
+          enum common {
+            value 0;
+            description "Indicates the common VLAN. A common VLAN can be used
+            as a Layer 2 VLAN or Layer 3 virtual interface.";
+          }
+          enum qinq {
+            value 1;
+            description "Indicates the QinQ VLAN. The VLAN packet with the QinQ 
+            attribute contains two VLAN tags, that is, the inner VLAN tag of the
+            private network and the outer VLAN tag allocated by the device. A 
+            Layer 2 VPN tunnel can be set up between private networks, so that 
+            the service can be transmitted transparently between these private 
+            networks.";
+          }
+          enum stacking {
+            value 2;
+            description "Indicates the stacking VLAN. The VLAN packet with the 
+            stacking attribute contains two VLAN tags, that is, the inner and 
+            outer VLAN tags allocated by the device. These tags are applicable 
+            to the dual-VLAN-tag authentication on the upper-layer BRAS to 
+            increase the number of access users. In the upper-layer network 
+            that works in the Layer 2 mode, packets can be forwarded directly 
+            by VLAN+MAC to provide the wholesale service for ISPs.";
+          }       
+        }
+        default common;
+        description "The tag attribute of the VLAN.";
+      }
+    }
+    
+    container management-vlan {
+      if-feature management-vlan;
+      description "Configures a VLAN as a management VLAN.";
+      leaf vlanid {
+        type uint16 {
+          range "1..4094";
+        }
+        description "Specifies the VLAN ID for management VLAN.";
+      }
+    }
+     
+      container lan-vlan {
+      if-feature lan-vlan;
+      description "Configures a VLAN as a lan VLAN.";
+      leaf vlanid {
+        type uint16 {
+          range "1..4094";
+        }
+        description "Specifies the VLAN ID for lan VLAN.";
+      }
+    }
+
+  }
+
+}
+

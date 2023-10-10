@@ -1,12 +1,12 @@
 module ccsa-an-slice-sbi-service {
-  namespace "urn:ccsa:yang:ccsa-an-slice-nsi";
+  namespace "urn:ccsa:yang:ccsa-an-slice-sbi-service";
   prefix an-slice-sbi-service;
 
   import ietf-interfaces {
     prefix if;
   }
 
-  import ccsa-an-slice-vlan {
+  import ccsa-an-slice-sbi-vlan {
     prefix an-slice-vlan;
   }
 
@@ -21,8 +21,9 @@ module ccsa-an-slice-sbi-service {
   description
     "Applicable for device configuration, of network service slices.";
 
-    revision 2023-08-17 {
-        description "Initial revision.";
+    revision 2023-10-08{
+        description
+            "Submit for Final Version.";
     }
 
     typedef nsi-service-type {
@@ -42,7 +43,7 @@ module ccsa-an-slice-sbi-service {
         description "Indicates the slice service type.";
     }
 
-    grouping slice-bandwidth{
+    grouping slice-bandwidth {
         description "Indicates the bandwidth and convergence ratio of a slice.";
         leaf bandwidth {
             type uint32 {
@@ -50,7 +51,7 @@ module ccsa-an-slice-sbi-service {
             }
             units "Mbit/s";
             mandatory true;
-            description "Indicates the bandwidth allocated to the port.";
+            description "Indicates the bandwidth allocated to the interface.";
         }
 
         leaf convergence-ratio {
@@ -67,9 +68,7 @@ module ccsa-an-slice-sbi-service {
         description
           "Indicates a network slice instance attribute.";
         leaf slice-name {
-            type string {
-                length "1..32";
-            }
+            type string;
             description
               "Indicates the name of a slice instance. Names with only one or more space characters are not supported.";
         }
@@ -80,7 +79,7 @@ module ccsa-an-slice-sbi-service {
             }
             mandatory true;
             description
-              "Indicates the slice priority. 6 and 7 indicate gold slices, and 1 to 5 indicate silver slices.
+              "Indicates the slice priority. 7 indicates the highest priority and 1 indicates the lowest priority.
                0 indicates for bronze slices without device support, so 0 is not allowed here.  ";
         }
 
@@ -158,45 +157,16 @@ module ccsa-an-slice-sbi-service {
                 leaf ifname {
                     type if:interface-ref;
                     must "/if:interfaces/if:interface[if:name = current()]/if:type='ianaift:ethernetCsmacd' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon' " {
-                        error-message
-                          "must reference an ethernetCsmacd interface, epon interface or gpon or vport interface.";
-                    }
+                          /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
+                          /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon' or
+                          /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani'  or
+                          /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani' or
+                          /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-pair' or
+                          /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-termination'";
                     description
-                      "Name of an ethernet port, epon port or gpon port.";
+                        "Name of interface.";
                 }
-
-                choice slice-port-type {
-                    description
-                      "Indicates the port type of a slice.";
-                    case port {
-                        description
-                          "Indicates an ethernet port or gpon port add to slice.";
-                        uses slice-bandwidth;
-                    }
-                    case port-channel {
-                        description
-                          "Indicates a combo pon port channel add to slice.";
-                        container channels {
-                            description
-                              "List of channels in a combo pon port.";
-                            list channel {
-                                key channel-index;
-                                description
-                                  "Configure combo pon port channel to a network slice.";
-                                leaf channel-index {
-                                    type uint8 {
-                                        range "0..1";
-                                    }
-                                    description
-                                      "The channel ID of a combo pon port.";
-                                }
-                                uses slice-bandwidth;
-                            }
-                        }
-                    }
-                }
+                uses slice-bandwidth;
             }
         }
     }
@@ -219,32 +189,15 @@ module ccsa-an-slice-sbi-service {
         }
     }
 
-    grouping dnet-slice-instance {
-        description
-          "Indicates the network slice instance of a dedicated network.";
-        container slice-instances {
-            description
-              "List of Slice Instances of a dedicated network.";
-            list slice-instance {
-                key "slice-name";
-                description
-                  "Configure a slice instance of a dedicated network.";
-                uses slice-instance-attr;
-                uses slice-instance-vlan;
-                uses slice-instance-port;
-            }
-        }
-    }
-
     container bb-nsi {
         description
-          "Indicates a slice. A slice instance can be configured. Add VLANs, ports, and VNIs to slices.";
+          "Indicates a slice instance configured without a dedicated network.";
         uses slice-instance;
     }
 
     augment "/an-slice-sbi-res:slice-an/an-slice-sbi-res:dedicated-networks/an-slice-sbi-res:dedicated-network" {
         description
           "Indicates a network slice instance can be configured under a dedicated network.";
-        uses dnet-slice-instance;
+        uses slice-instance;
     }
 }
