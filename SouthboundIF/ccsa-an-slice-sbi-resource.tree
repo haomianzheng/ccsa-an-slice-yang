@@ -1,16 +1,16 @@
 module: ccsa-an-slice-sbi-resource
-   +--rw slice-an
-      +--rw mode?                 slice-mode
-      +--rw dedicated-networks
-         +--rw dedicated-network* [name]
-            +--rw name           string
-            +--ro id?            uint32
-            +--rw description?   string
-            +--rw interfaces
-               +--rw interface* [ifname]
-                  +--rw ifname                 if:interface-ref
-                  +--rw (bandwidth-type)?
-                     +--:(unlimited)
-                     |  +--rw unlimited-bandwidth?   empty
-                     +--:(bandwidth)
-                        +--rw assured-bandwidth?     uint32
+  +--rw slice-an
+     +--rw mode?                 slice-mode
+     +--rw dedicated-networks
+        +--rw dedicated-network* [name]
+           +--rw name           string
+           +--ro id?            uint32
+           +--rw description?   string
+           +--rw interfaces
+              +--rw interface* [ifname]
+                 +--rw ifname                       if:interface-ref
+                 +--rw (bandwidth-type)?
+                    +--:(unlimited)
+                    |  +--rw unlimited-bandwidth?   empty
+                    +--:(bandwidth)
+                       +--rw assured-bandwidth?     uint64

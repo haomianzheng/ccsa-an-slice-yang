@@ -1,122 +1,122 @@
 module ccsa-an-slice-sbi-resource {
-    namespace "urn:ccsa:yang:ccsa-an-slice-dnet";
-    prefix an-slice-sbi-res;
+  namespace "urn:ccsa:yang:ccsa-an-slice-dnet";
+  prefix an-slice-sbi-res;
 
-    import ietf-interfaces {
-        prefix if;
-    }
+  import ietf-interfaces {
+    prefix if;
+  }
+  import iana-if-type {
+    prefix ianaift;
+  }
 
-    organization
-      "CCSA";
+  organization
+    "CCSA";
+  description
+    "Applicable for device configuration, of network resource slices.";
+
+  revision 2023-10-08 {
     description
-      "Applicable for device configuration, of network resource slices.";
+      "Submit for Final Version.";
+  }
 
-    revision 2023-10-08{
+  typedef slice-mode {
+    type enumeration {
+      enum van {
+        value 0;
+        description
+          "The access node creates a virtual system to implement slicing.";
+      }
+      enum fans {
+        value 1;
+        description
+          "The access node creates channelized sub-interfaces to implement slicing.";
+      }
+    }
+    description
+      "This attribute depicts slice mode.";
+  }
+
+  container slice-an {
+    description
+      "Configure the system slice mode.";
+    leaf mode {
+      type slice-mode;
+      default "fans";
       description
-          "Submit for Final Version.";
+        "Configure slice mode. The value can be van, fans.";
     }
-
-    typedef slice-mode {
-        type enumeration {
-            enum "van" {
-                value 0;
-                description
-                  "The access node creates a virtual system to implement slicing.";
-            }
-            enum "fans" {
-                value 1;
-                description
-                  "The access node creates channelized sub-interfaces to implement slicing.";
-            }
-        }
+    container dedicated-networks {
+      description
+        "List of dedicated-networks.";
+      list dedicated-network {
+        key "name";
         description
-          "This attribute depicts slice mode.";
-    }
-
-    container slice-an {
-        description
-          "Configure the system slice mode.";
-        leaf mode {
-            type slice-mode;
-            default "fans";
-            description
-              "Configure slice mode. The value can be van, fans.";
+          "Configure a dedicated-network.";
+        leaf name {
+          type string;
+          description
+            "Indicates the name of a dedicated-network. Names with only one or more space characters are not supported. DNet-0 exists by default.";
         }
-        container dedicated-networks {
+        leaf id {
+          type uint32 {
+            range "0..8";
+          }
+          config false;
+          description
+            "Indicates the dedicated network ID. The value is automatically allocated by the system when the dedicated network is created. The value ranges from 0 to 8.";
+        }
+        leaf description {
+          type string {
+            length "1..64";
+          }
+          description
+            "Indicates the description of a dedicated-network. Descriptions with only one or more space characters are not supported.";
+        }
+        container interfaces {
+          description
+            "List of interfaces in a dedicated-network.";
+          list interface {
+            key "ifname";
             description
-              "List of dedicated-networks.";
-            list dedicated-network {
-                key "name";
-                description
-                  "Configure a dedicated-network.";
-                leaf name {
-                    type string;
-                    description
-                      "Indicates the name of a dedicated-network. Names with only one or more space characters are not supported. DNet-0 exists by default.";
-                }
-                leaf id {
-                    type uint32 {
-                        range "0..8";
-                    }
-                    config false;
-                    description
-                      "Indicates the dedicated network ID. The value is automatically allocated by the system when the dedicated network is created. The value ranges from 0 to 8.";
-                }
-                leaf description {
-                    type string {
-                        length "1..64";
-                    }
-                    description
-                      "Indicates the description of a dedicated-network. Descriptions with only one or more space characters are not supported.";
-                }
-                container interfaces {
-                    description
-                      "List of interfaces in a dedicated-network.";
-                    list interface {
-                        key "ifname";
-                        description
-                          "Configure interface to a dedicated-network.";
-                        leaf ifname {
-                            type if:interface-ref;
-                            must "/if:interfaces/if:interface[if:name = current()]/if:type='ianaift:ethernetCsmacd' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani'  or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-pair' or
-                                  /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-termination'";
-                            description
-                              "Name of interface.";
-                        }
-                        
-                        choice bandwidth-type {
-                            description
-                                "Indicates the bandwidth configured for a interface. The bandwidth can be set to unlimited or assured bandwidth.";
-                            case unlimited {
-                                description
-                                  "Indicates that the bandwidth is not limited.";
-                                leaf unlimited-bandwidth {
-                                    type empty;
-                                    description
-                                      "Indicates that the bandwidth of the slice interface is not limited.";
-                                }
-                            }
-                            case bandwidth {
-                                description
-                                  "Indicates that the interface bandwidth can be configured.";
-                                leaf assured-bandwidth {
-                                    type uint32 {
-                                        range "1..100000";
-                                    }
-                                    units "Mbit/s";
-                                    description
-                                      "Indicates the assured bandwidth allocated to a interface.";
-                                }
-                            }
-                        }
-                    }
-                }
+              "Configure interface to a dedicated-network.";
+            leaf ifname {
+              type if:interface-ref;
+              must "/if:interfaces/if:interface[if:name = current()]/if:type='ianaift:ethernetCsmacd' or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon' or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani'  or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani' or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-pair' or
+                    /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-termination'";
+              description
+                "Name of interface.";
             }
+            choice bandwidth-type {
+              description
+                "Indicates the bandwidth configured for a interface. The bandwidth can be set to unlimited or assured bandwidth.";
+              case unlimited {
+                description
+                  "Indicates that the bandwidth is not limited.";
+                leaf unlimited-bandwidth {
+                  type empty;
+                  description
+                    "Indicates that the bandwidth of the slice interface is not limited.";
+                }
+              }
+              case bandwidth {
+                description
+                  "Indicates that the interface bandwidth can be configured.";
+                leaf assured-bandwidth {
+                  type uint64;
+                  units "bits/second";
+                  description
+                    "Indicates the assured bandwidth allocated to a interface.";
+                }
+              }
+            }
+          }
         }
+      }
     }
+  }
 }
