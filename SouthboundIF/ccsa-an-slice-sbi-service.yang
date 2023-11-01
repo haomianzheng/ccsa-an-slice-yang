@@ -22,9 +22,9 @@ module ccsa-an-slice-sbi-service {
   description
     "Applicable for device configuration, of network service slices.";
 
-  revision 2023-10-08 {
+  revision 2023-11-01 {
     description
-      "Submit for Final Version.";
+      "Submit for Final Version";
   }
 
   typedef nsi-service-type {
@@ -106,14 +106,25 @@ module ccsa-an-slice-sbi-service {
     container vlans {
       description
         "List of VLANs in a network slice instance.";
-      list vlan {
+      list network-vlan {
         key "vlan-id";
         description
-          "Configure VLAN to a network slice.";
+          "Configure network VLAN to a network slice, consistent with S-VLAN ID.";
         leaf vlan-id {
-          type leafref {
-            path "/an-slice-vlan:vlans/an-slice-vlan:vlan/an-slice-vlan:id";
-          }
+          type an-slice-vlan:l2-forwarder;
+          description
+            "Configure a VLAN to a network slice.
+              VLAN 1 and reserved VLANs cannot be added to network slices.
+              After a port VLAN or service flow is added to a VLAN, the VLAN cannot be added to a network slice.
+              A slice can be added to a maximum of 32 VLANs.";
+        }
+      }
+      list user-vlan {
+        key "vlan-id";
+        description
+          "Configure user VLAN to a network slice.";
+        leaf vlan-id {
+          type an-slice-vlan:l2-forwarder;
           description
             "Configure a VLAN to a network slice.
               VLAN 1 and reserved VLANs cannot be added to network slices.
@@ -161,7 +172,7 @@ module ccsa-an-slice-sbi-service {
                 /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:gpon' or
                 /if:interfaces/if:interface[if:name = current()]/if:type='ianaift:aluEpon' or
                 /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani'  or
-                /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:ani' or
+                /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:v-ani' or
                 /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-pair' or
                 /if:interfaces/if:interface[if:name = current()]/if:type='bbf-xponift:channel-termination'";
           description
