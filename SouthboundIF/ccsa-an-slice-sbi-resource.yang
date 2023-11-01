@@ -1,5 +1,5 @@
 module ccsa-an-slice-sbi-resource {
-  namespace "urn:ccsa:yang:ccsa-an-slice-dnet";
+  namespace "urn:ccsa:yang:ccsa-an-slice-sbi-resource";
   prefix an-slice-sbi-res;
 
   import ietf-interfaces {
