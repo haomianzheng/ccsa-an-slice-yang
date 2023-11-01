@@ -6,11 +6,11 @@ module: ccsa-an-slice-dnet
          +--rw ns-description?   string
          +--rw ltp-slices
             +--rw ltp-slice* [ltp-slice-res-id]
-               +--rw ns-res-id           string
+               +--rw ns-res-id           yang:uuid
                +--rw ltp-slice-res-id    string
                +--rw ne-res-id?          yang:uuid
                +--rw ltp-res-id?         yang:uuid
                +--rw ltp-slice-info
-                  +--rw assigned-bandwidth?   decimal64
-                  +--rw used-bandwidth?       decimal64
+                  +--rw assigned-bandwidth?   uint64
+                  +--ro used-bandwidth?       uint64
                   +--rw convergence-ratio?    decimal64

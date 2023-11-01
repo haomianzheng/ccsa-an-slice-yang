@@ -24,10 +24,9 @@ module ccsa-an-slice-service {
   description
     "The model is defined for Access Network service slicing.";
 
-  revision 2023-08-17 {
+  revision 2023-10-08{
     description
-      "Initial revision.";
-
+      "Submit for Final Version.";
   }
 
   identity isolation-type {
@@ -66,6 +65,33 @@ module ccsa-an-slice-service {
       units bit/s;
       description
         "Link capacity that is allocated to the given traffic flow.";
+    }
+
+    leaf max-latency {
+      type uint32;
+      units us;
+      description
+        "Maximum latency in microseconds.";
+    }
+
+    leaf max-jitter {
+      type uint32;
+      units us;
+      description
+        "The variation in packet delay is called jitter.
+         Packet delay variation (PDV) is measured by the difference
+         in the one-way delay between sequential packets in a flow.
+         jitter quantified in units of microseconds.";
+    }
+
+    leaf max-loss {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      units %;
+      description
+        "Packet loss as a percentage of the total traffic sent
+         over a configurable interval. ";
     }
   }
 
@@ -106,40 +132,6 @@ module ccsa-an-slice-service {
       uses traffic-grouping;
     }
 
-    leaf max-latency {
-      type uint32 {
-        range "0..16777215";
-      }
-      units us;
-      description
-        "Maximum latency in microseconds.";
-    }
-
-    leaf max-jitter {
-      type uint32 {
-        range "0..16777215";
-      }
-      units us;
-      description
-        "The variation in packet delay is called jitter.
-         Packet delay variation (PDV) is measured by the difference
-         in the one-way delay between sequential packets in a flow.
-         jitter quantified in units of microseconds.";
-    }
-
-    leaf max-loss {
-      type decimal64 {
-        fraction-digits 6;
-        range "0 .. 50.331642";
-      }
-      units %;
-      description
-        "Packet loss as a percentage of the total traffic sent
-         over a configurable interval. The finest precision is
-         0.000003%. where the maximum 50.331642%.";
-      reference
-        "RFC 7810, section-4.4";
-    }
   }
 
   grouping vlan-grouping {
@@ -163,20 +155,17 @@ module ccsa-an-slice-service {
     description
       "For the management of service slice instances.";
 
-    container slats {
+    container sla-templates {
       description
         "List of Service Level Agreement (SLA) templates.";
 
-      list slat { 
+      list sla-template { 
         key "template-name";
         description
           "Configure Service Level Agreement (SLA) template.";
 
         leaf template-name {
-          type string {
-            length 1..32;
-          }
-
+          type string;
           description
             "Service Level Agreement (SLA) templates name.";
         }
@@ -185,19 +174,17 @@ module ccsa-an-slice-service {
       }
     }
 
-    container nsts {
+    container ns-templates {
       description
         "List of Network Slicing Templates (NST).";
 
-      list nst {
+      list ns-template {
         key "name";
         description
           "Configure Network Slicing Templates (NST).";
 
         leaf name {
-          type string {
-            length 1..32;
-          }
+          type string;
 
           description
             "Network slicing template name.";
@@ -205,7 +192,7 @@ module ccsa-an-slice-service {
 
         leaf sla-template-name {
           type leafref {
-            path "/slice-service/slats/slat/template-name";
+            path "/slice-service/sla-templates/sla-template/template-name";
           }
 
           description
@@ -220,40 +207,38 @@ module ccsa-an-slice-service {
             "The service isolation level.";
         }
 
-        list app-type {
-            key "main-type sub-type";
-            leaf main-type{
-                 type string {
-                    length 1..32;          
-                }
-                   description
-                    "The APP service main type name. Enumerated value: APP-ALL/APP-OTT-VIDEO/APP-GAME/APP-EDUCATION/APP-OFFICE/APP-SELF-OPER-VIDEO/APP-SHORT-VIDEO  ";     
+        list app-info {
+            key "app-type app-name";
+            leaf app-type{
+              type string;
+              description
+                "The APP type. For Example: APP-ALL/APP-OTT-VIDEO/APP-GAME/APP-EDUCATION/APP-OFFICE/APP-SELF-OPER-VIDEO/APP-SHORT-VIDEO/...  ";     
             }  
-            leaf sub-type{
-                 type string {
-                    length 1..32;          
-                }
-                   description
-                    "The APP service sub type name.  For Example:  TENCENT-VIDEO/VIP-KID/HONOR-OF-KINGS/...";     
+            leaf app-name{
+              type string;
+              description
+                "The APP name.  For Example:  TENCENT-VIDEO/VIP-KID/HONOR-OF-KINGS/...";     
             }                 
-         }
- 
+        }
       }
     }
 
-    container nsis {
+    container ns-instances {
       description
         "List of Network Service Slicing Instance (NSI).";
 
-      list nsi {
-        key "nst-name";
-
+      list ns-instance {
+        key "nsi-id";
         description
           "Configure network slice instance.";
+        
+        leaf nsi-id {
+          type yang:uuid;
+        }
 
         leaf nst-name {
           type leafref {
-            path "/slice-service/nsts/nst/name";
+            path "/slice-service/ns-templates/ns-template/name";
           }
 
           description
@@ -283,7 +268,6 @@ module ccsa-an-slice-service {
                 key "ltp-slice-res-id";
                 description
                   "Indicates the unique ID of the ltp slice.";
-
                 uses an-slice-type:ltp-slice-single;
               }
             }
@@ -291,31 +275,27 @@ module ccsa-an-slice-service {
             container uni-ports {
               description
                 "List of UNI ports.";
-
               list uni-port {
-                
                key "ltp-slice-res-id";
                description
                 "Indicates the unique ID of the ltp slice.";    
-
                 uses  an-slice-type:ltp-slice-single;
               }
             }
           }
         }
 
-        container onts {
+        container onus {
           description
-                   "List of ont.";
+            "List of ont.";
 
-          list ont {
+          list onu {
             key "onu-res-id";
             description
                "Configure ont network slicing instance.";
 
             leaf onu-res-id {
               type string {
-                length 1..36;
                 pattern '[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}';
               }
               description
@@ -328,7 +308,6 @@ module ccsa-an-slice-service {
                 description
                     "The auth type for the WAN port, include IPoE/PPPoE/... .";        
             }
-        
           }
         }
       }
