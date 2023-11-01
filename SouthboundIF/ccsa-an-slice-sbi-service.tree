@@ -1,50 +1,38 @@
 module: ccsa-an-slice-sbi-service
-   +--rw bb-nsi
-      +--rw slice-instances
-         +--rw slice-instance* [slice-name]
-            +--rw slice-name      string
-            +--rw priority        uint8
-            +--rw queue-buffer?   uint8
-            +--rw service-type?   nsi-service-type
-            +--rw vlans
-            |  +--rw vlan* [vlan-id]
-            |     +--rw vlan-id    leafref
-            +--rw vxlans
-            |  +--rw vxlan* [vni-id]
-            |     +--rw vni-id    uint32
-            +--rw ports
-               +--rw port* [ifname]
-                  +--rw ifname               if:interface-ref
-                  +--rw (slice-port-type)?
-                     +--:(port)
-                     |  +--rw bandwidth            uint32
-                     |  +--rw convergence-ratio?   decimal64
-                     +--:(port-channel)
-                        +--rw channels
-                           +--rw channel* [channel-index]
-                              +--rw channel-index        uint8
-                              +--rw bandwidth            uint32
-                              +--rw convergence-ratio?   decimal64
-augment /an-slice-sbi-res:slice-an/an-slice-sbi-res:dedicated-networks/an-slice-sbi-res:dedicated-network:
-   +--rw slice-instances
-      +--rw slice-instance* [slice-name]
-         +--rw slice-name      string
-         +--rw priority        uint8
-         +--rw queue-buffer?   uint8
-         +--rw service-type?   nsi-service-type
-         +--rw vlans
-         |  +--rw vlan* [vlan-id]
-         |     +--rw vlan-id    leafref
-         +--rw ports
-            +--rw port* [ifname]
-               +--rw ifname               if:interface-ref
-               +--rw (slice-port-type)?
-                  +--:(port)
-                  |  +--rw bandwidth            uint32
-                  |  +--rw convergence-ratio?   decimal64
-                  +--:(port-channel)
-                     +--rw channels
-                        +--rw channel* [channel-index]
-                           +--rw channel-index        uint8
-                           +--rw bandwidth            uint32
-                           +--rw convergence-ratio?   decimal64
+  +--rw bb-nsi
+     +--rw slice-instances
+        +--rw slice-instance* [slice-name]
+           +--rw slice-name      string
+           +--rw priority        uint8
+           +--rw queue-buffer?   uint8
+           +--rw service-type?   nsi-service-type
+           +--rw vlans
+           |  +--rw vlan* [vlan-id]
+           |     +--rw vlan-id    -> /an-slice-vlan:vlans/vlan/id
+           +--rw vxlans
+           |  +--rw vxlan* [vni-id]
+           |     +--rw vni-id    uint32
+           +--rw ports
+              +--rw port* [ifname]
+                 +--rw ifname               if:interface-ref
+                 +--rw bandwidth            uint64
+                 +--rw convergence-ratio?   decimal64
+
+  augment /an-slice-sbi-res:slice-an/an-slice-sbi-res:dedicated-networks/an-slice-sbi-res:dedicated-network:
+    +--rw slice-instances
+       +--rw slice-instance* [slice-name]
+          +--rw slice-name      string
+          +--rw priority        uint8
+          +--rw queue-buffer?   uint8
+          +--rw service-type?   nsi-service-type
+          +--rw vlans
+          |  +--rw vlan* [vlan-id]
+          |     +--rw vlan-id    -> /an-slice-vlan:vlans/vlan/id
+          +--rw vxlans
+          |  +--rw vxlan* [vni-id]
+          |     +--rw vni-id    uint32
+          +--rw ports
+             +--rw port* [ifname]
+                +--rw ifname               if:interface-ref
+                +--rw bandwidth            uint64
+                +--rw convergence-ratio?   decimal64
