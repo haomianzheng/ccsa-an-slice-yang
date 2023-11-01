@@ -6,22 +6,11 @@ module: ccsa-an-slice-sbi-resource
             +--rw name           string
             +--ro id?            uint32
             +--rw description?   string
-            +--rw ports
-               +--rw port* [ifname]
-                  +--rw ifname               if:interface-ref
-                  +--rw (slice-port-type)?
-                     +--:(port)
-                     |  +--rw port-bandwidth
-                     |     +--rw (port-bandwidth-type)?
-                     |        +--:(unlimited)
-                     |        |  +--rw unlimited-bandwidth?   empty
-                     |        +--:(port-bandwidth)
-                     |           +--rw assured-bandwidth?     uint32
-                     +--:(port-channel)
-                        +--rw channel-bandwidth
-                           +--rw (channel-bandwidth-type)?
-                              +--:(unlimited)
-                              |  +--rw unlimited-bandwidth?           empty
-                              +--:(channel-bandwidth)
-                                 +--rw channel-0-assured-bandwidth    uint32
-                                 +--rw channel-1-assured-bandwidth    uint32
+            +--rw interfaces
+               +--rw interface* [ifname]
+                  +--rw ifname                 if:interface-ref
+                  +--rw (bandwidth-type)?
+                     +--:(unlimited)
+                     |  +--rw unlimited-bandwidth?   empty
+                     +--:(bandwidth)
+                        +--rw assured-bandwidth?     uint32
